@@ -4,6 +4,6 @@ I have planned to apply AI to Games.
    Copy and paste the code in a file 
    Install python3 and also install pygame
    Run the Command 'python3 tic_tac_toe.py' in terminal
-   You will play against my AI , My AI in this game used MiniMax algorithm to make the best decision
+   You will play against my AI , My AI in this game uses MiniMax algorithm to make the best decision
    It took one day to write this code.
    Thanks!
