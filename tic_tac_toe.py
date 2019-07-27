@@ -16,7 +16,7 @@ blue = (0,0,255)
 black = (0,0,0)
 
 screen = pygame.display.set_mode((width,height))
-
+pygame.display.set_caption("Tic Tac Toe")
 clock = pygame.time.Clock()
 
 game_over = False 
