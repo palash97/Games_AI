@@ -1,15 +1,20 @@
-import pygame
+
+# Follow the comments to understand the code
+
+import pygame  # pygame is a  python library we will use to make games
 import sys
 import numpy as np 
 import random 
 from time import sleep 
-pygame.init()
-pygame.font.init()
 
+pygame.init()  # initializing pygames
+pygame.font.init() 
 
-width = 900
+# we will have a screen with some width and height 
+width = 900  
 height = 900
 
+# storing RGB values into variables, so that they can be used as an when needed
 red = (200,0,0)
 dark_red = (255,0,0)
 green = (0,255,0)
@@ -17,25 +22,28 @@ blue = (0,0,255)
 black = (0,0,0)
 white = (255,255,255)
 
-screen = pygame.display.set_mode((width,height))
-pygame.display.set_caption("Tic Tac Toe")
+screen = pygame.display.set_mode((width,height)) # this is how you initialize a screen in pygames with some width and height
+pygame.display.set_caption("Tic Tac Toe") # this is basically caption of our screen
 clock = pygame.time.Clock()
 
  
 
 thickness = 60
 
-myfont = pygame.font.SysFont('Comic Sans MS', 300)
-myfont2 = pygame.font.SysFont('Comic Sans MS', 100)
-textsurfacex = myfont.render('X', True, blue)
-posx = myfont.size('X')
+myfont = pygame.font.SysFont('Comic Sans MS', 300) # myfont consist of a font-style and can used when needed
+myfont2 = pygame.font.SysFont('Comic Sans MS', 100) # myfont2 consist of a another font-style
+textsurfacex = myfont.render('X', True, blue) # textsurfacex is basically letter "X" with font-style myfont
+posx = myfont.size('X') #posx consist of height and width of letter "X", when written in font-style myfont
 
-textsurfaceo = myfont.render('O', True, blue)
+textsurfaceo = myfont.render('O', True, blue) # textsurfacex is basically letter "O" with font-style myfont
 poso = myfont.size('O')
 
 player = 2 
-opponent = 1
+opponent = 1 # there will be 2 players in this game, assigning a integer to them
 
+
+# In the below function, we are creating a board, which will carry the state of our game. The board is a 3*3 matrix. 2 will represent "X"
+# and 1 will represent "O" 
 def create_board(): 
     return(np.array([[0, 0, 0], 
                      [0, 0, 0], 
@@ -69,15 +77,15 @@ def draw_button(text,location_x,location_y,b_width,b_height,font,color1,color2,t
 
 
 
-
+# This function will draw 2 horizontal and 2 vertical lines on our screen
 def drawlines():
-	pygame.draw.line(screen,red,(0,height/3),(width,height/3),thickness)
+	pygame.draw.line(screen,red,(0,height/3),(width,height/3),thickness) #specifying color , position , thickness of line to be drawn on our screen
 	pygame.draw.line(screen,red,(0,height*2/3),(width,height*2/3),thickness)
 	pygame.draw.line(screen,red,(width/3,0),(width/3,height),thickness)
 	pygame.draw.line(screen,red,(width*2/3,0),(width*2/3,height),thickness)
 
 
-
+# This function map the cordinates of mouse to the row,column of board those cordinated belong to.
 def map_mouse_to_board(x, y):
     if x < width / 3- thickness/2:
         column = 0
@@ -93,12 +101,15 @@ def map_mouse_to_board(x, y):
         row = 2
     return column, row
 
+# This function draws X in row(x) and column(y) of our board
 def drawX(x,y):
-	screen.blit(textsurfacex,((2*x+1)*width/6 -posx[0]/2,(2*y+1)*height/6-posx[1]/2))
+	screen.blit(textsurfacex,((2*x+1)*width/6 -posx[0]/2,(2*y+1)*height/6-posx[1]/2)) # screen.blit , pastes textsurfacex on a given postion
 
+# This function draws O in row(x) and column(y) of our board
 def drawO(x,y):
 	screen.blit(textsurfaceo,((2*x+1)*width/6 -poso[0]/2,(2*y+1)*height/6-poso[1]/2))
 
+# This function evaluates if any player has won the game and return a score accordingly (10, -10, 0 if none has won the game as of now)
 def evaluate(board):
     for row in range(0,3):
         if(board[row][0]==board[row][1] and board[row][1]==board[row][2]):
@@ -129,6 +140,7 @@ def evaluate(board):
 
     return 0
 
+# If the whole board is fill this function return true 
 def checkgameover(board):
 	for i in range(0,3):
 		for j in range(0,3):
