@@ -10,29 +10,65 @@ pygame.font.init()
 width = 900
 height = 900
 
-red = (255,0,0)
+red = (200,0,0)
+dark_red = (255,0,0)
 green = (0,255,0)
 blue = (0,0,255)
 black = (0,0,0)
+white = (255,255,255)
 
 screen = pygame.display.set_mode((width,height))
 pygame.display.set_caption("Tic Tac Toe")
 clock = pygame.time.Clock()
 
-game_over = False 
+ 
 
 thickness = 60
 
 myfont = pygame.font.SysFont('Comic Sans MS', 300)
 myfont2 = pygame.font.SysFont('Comic Sans MS', 100)
-textsurfacex = myfont.render('X', False, blue)
+textsurfacex = myfont.render('X', True, blue)
 posx = myfont.size('X')
 
-textsurfaceo = myfont.render('O', False, blue)
+textsurfaceo = myfont.render('O', True, blue)
 poso = myfont.size('O')
 
 player = 2 
 opponent = 1
+
+def create_board(): 
+    return(np.array([[0, 0, 0], 
+                     [0, 0, 0], 
+                     [0, 0, 0]]))
+
+def display_text(text,location_x,location_y,font,color,fontsize):
+	font = pygame.font.SysFont(font,fontsize)
+	textsurface = font.render(text,True,color)
+	textrect = textsurface.get_rect()
+	textrect.center = (location_x,location_y)
+	screen.blit(textsurface,textrect)
+
+def draw_button(text,location_x,location_y,b_width,b_height,font,color1,color2,text_color,fontsize,action):
+	mouse = pygame.mouse.get_pos()
+	click = pygame.mouse.get_pressed()
+	if mouse[0]>location_x and mouse[0]<location_x + b_width and mouse[1]>location_y and mouse[1]<location_y+b_height:
+		pygame.draw.rect(screen,color1,(location_x,location_y,b_width,b_height))
+		if click[0]==1:
+			if(action=='quit'):
+				sys.exit()
+			if(action=='start'):
+				game_play()
+			
+	else:
+		pygame.draw.rect(screen,color2,(location_x,location_y,b_width,b_height))
+	font = pygame.font.SysFont(font,fontsize)
+	textsurface = font.render(text,True,text_color)
+	textrect = textsurface.get_rect()
+	textrect.center = (location_x+b_width/2,location_y+b_height/2)
+	screen.blit(textsurface,textrect)
+
+
+
 
 def drawlines():
 	pygame.draw.line(screen,red,(0,height/3),(width,height/3),thickness)
@@ -40,10 +76,7 @@ def drawlines():
 	pygame.draw.line(screen,red,(width/3,0),(width/3,height),thickness)
 	pygame.draw.line(screen,red,(width*2/3,0),(width*2/3,height),thickness)
 
-def create_board(): 
-    return(np.array([[0, 0, 0], 
-                     [0, 0, 0], 
-                     [0, 0, 0]]))
+
 
 def map_mouse_to_board(x, y):
     if x < width / 3- thickness/2:
@@ -156,84 +189,104 @@ def best_move(board):
     return board 
 	
 
+def game_play():
+	board = create_board()
+	game_over = False
+	chance = 'human'
+	winner = 'nothing'
+	l = 1
+	while True:
+		for event in pygame.event.get():
 
+			if event.type == pygame.QUIT:
+			    sys.exit() 
 
-board = create_board()
+			if(not game_over):
+				screen.fill(white)
+				drawlines()
 
-chance = 'human'
-winner = 'nothing'
-l = 1
-while True:
-	for event in pygame.event.get():
+				if(chance == 'human' and not game_over):
+					if event.type is pygame.MOUSEBUTTONDOWN :
+						(mouseX, mouseY) = pygame.mouse.get_pos()
+						(row, column) = map_mouse_to_board(mouseX, mouseY)
+						board[row][column] = 1
+						score = evaluate(board)
+						if(score==-10):
+							game_over = True
+							winner = 'User'
+						chance = 'computer'
 
-		if event.type == pygame.QUIT:
-		    sys.exit() 
+			
 
-		if(not game_over):
-			drawlines()
+				for x in range(0,3):
+					for y in range(0,3):
+						if(board[x][y]==1):
+							drawX(x,y)
+						if(board[x][y]==2):
+							drawO(x,y)
+				
+				if(checkgameover(board)):
+					game_over = True
+					if(winner == 'nothing'):
+						winner = 'Draw'
+				
+				if(chance == 'computer' and not game_over):
+					best_move(board)
+					chance = 'human'
 
-			if(chance == 'human' and not game_over):
-				if event.type is pygame.MOUSEBUTTONDOWN :
-					(mouseX, mouseY) = pygame.mouse.get_pos()
-					(row, column) = map_mouse_to_board(mouseX, mouseY)
-					board[row][column] = 1
-					score = evaluate(board)
-					if(score==-10):
-						game_over = True
-						winner = 'User'
-					chance = 'computer'
+				score = evaluate(board)
+				if(score==10):
+					winner = 'Palash\'s AI'
+					game_over=True
 
+				if(checkgameover(board)):
+					game_over = True
+					if(winner == 'nothing'):
+						winner = 'Draw'
+			    
+				for x in range(0,3):
+					for y in range(0,3):
+						if(board[x][y]==1):
+							drawX(x,y)
+						if(board[x][y]==2):
+							drawO(x,y)
+
+			pygame.display.update()
+			
+			if(game_over and l==1):
+				sleep(2)
+				l = 2
+			
+			
+			
+			if(game_over):
+				screen.fill(white)
+				if(winner == 'Draw'):
+					display_text('It\'s a ' + winner,width/2,height/2-50,'purisa',dark_red,75)
+				else:
+					display_text('Winner is ' + winner,width/2,height/2-50,'purisa',dark_red,75)
+				draw_button('Start Game',width/2-225,height/2+25,200,50,'purisa',red,dark_red,white,25,'start')
+				draw_button('Quit Game',width/2+25,height/2+25,200,50,'purisa',red,dark_red,white,25,'quit')
+
+def game_intro_display():
+	display_text('Tic-Tac-Toe',width/2,height/2-50,'purisa',dark_red,75)
+	draw_button('Start Game',width/2-225,height/2+25,200,50,'purisa',red,dark_red,white,25,'start')
+	draw_button('Quit Game',width/2+25,height/2+25,200,50,'purisa',red,dark_red,white,25,'quit')
+
+def game_intro():
+	gameintro = True
+	while gameintro:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+			    sys.exit()
 		
-
-			for x in range(0,3):
-				for y in range(0,3):
-					if(board[x][y]==1):
-						drawX(x,y)
-					if(board[x][y]==2):
-						drawO(x,y)
-			
-			if(checkgameover(board)):
-				game_over = True
-				if(winner == 'nothing'):
-					winner = 'Draw'
-			
-			if(chance == 'computer' and not game_over):
-				best_move(board)
-				chance = 'human'
-
-			score = evaluate(board)
-			if(score==10):
-				winner = 'Palash\'s AI'
-				game_over=True
-
-			if(checkgameover(board)):
-				game_over = True
-				if(winner == 'nothing'):
-					winner = 'Draw'
-		    
-			for x in range(0,3):
-				for y in range(0,3):
-					if(board[x][y]==1):
-						drawX(x,y)
-					if(board[x][y]==2):
-						drawO(x,y)
-
+		screen.fill(white)
+		game_intro_display()
 		pygame.display.update()
-		
-		if(game_over and l==1):
-			sleep(5)
-			l = 2
-		
-		screen.fill(black)
-		
-		if(game_over):
-			if(winner == 'Draw'):
-				textsurface = myfont2.render('It\'s a ' + winner, False, blue)
-				posw = myfont2.size('It\'s a ' + winner)
-			else:
-				textsurface = myfont2.render('Winner is ' + winner, False, blue)
-				posw = myfont2.size('Winner is ' + winner)
-			screen.blit(textsurface,(width/2-posw[0]/2,height/2-posw[1]/2))
+		clock.tick(10)
+
+game_intro()
+sys.exit()
 
 
 
