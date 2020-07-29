@@ -248,7 +248,7 @@ def game_play():
 
 				score = evaluate(board)
 				if(score==10):
-					winner = 'Palash\'s AI'
+					winner = 'Computer'
 					game_over=True
 
 				if(checkgameover(board)):
